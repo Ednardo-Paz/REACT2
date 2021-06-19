@@ -1,13 +1,30 @@
-import React from 'react'
+import React from 'react';
 
-const Input = ({label, id, value, setValue,...rest}) => {
-  
+const Input = ({
+  id,
+  label,
+  value,
+  type,
+  onChange,
+  error,
+  onBlur,
+  placeholder,
+}) => {
   return (
     <>
-      <label id={id} htmlFor="">{label}</label>
-      <input id={id} onChange={({target}) => setValue(target.value)} value={value} name={id} type="text" {...rest}  />
+      <label htmlFor={id}>{label}</label>
+      <input
+        type={type}
+        id={id}
+        name={id}
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+        placeholder={placeholder}
+      />
+      {error && <p>{error}</p>}
     </>
-  )
-}
+  );
+};
 
-export default Input
+export default Input;
