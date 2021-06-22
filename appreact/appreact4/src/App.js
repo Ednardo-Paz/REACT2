@@ -1,96 +1,94 @@
-import React from 'react'
-const formFields = [
+import React from 'react';
+import Radio from './forms/Radio';
+
+const perguntas = [
   {
-    id: 'nome',
-    label: 'Nome',
-    type: 'text',
+    pergunta: 'Qual método é utilizado para criar componentes?',
+    options: [
+      'React.makeComponent()',
+      'React.createComponent()',
+      'React.createElement()',
+    ],
+    resposta: 'React.createElement()',
+    id: 'p1',
   },
   {
-    id: 'email',
-    label: 'Email',
-    type: 'email',
+    pergunta: 'Como importamos um componente externo?',
+    options: [
+      'import Component from "./Component"',
+      'require("./Component")',
+      'import "./Component"',
+    ],
+    resposta: 'import Component from "./Component"',
+    id: 'p2',
   },
   {
-    id: 'senha',
-    label: 'Senha',
-    type: 'password',
+    pergunta: 'Qual hook não é nativo?',
+    options: ['useEffect()', 'useFetch()', 'useCallback()'],
+    resposta: 'useFetch()',
+    id: 'p3',
   },
   {
-    id: 'cep',
-    label: 'Cep',
-    type: 'text',
-  },
-  {
-    id: 'rua',
-    label: 'Rua',
-    type: 'text',
-  },
-  {
-    id: 'numero',
-    label: 'Numero',
-    type: 'text',
-  },
-  {
-    id: 'bairro',
-    label: 'Bairro',
-    type: 'text',
-  },
-  {
-    id: 'cidade',
-    label: 'Cidade',
-    type: 'text',
-  },
-  {
-    id: 'estado',
-    label: 'Estado',
-    type: 'text',
+    pergunta: 'Qual palavra deve ser utilizada para criarmos um hook?',
+    options: ['set', 'get', 'use'],
+    resposta: 'use',
+    id: 'p4',
   },
 ];
 
-
 const App = () => {
-  const [form, setForm] = React.useState( 
-formFields.reduce((acc, form) => {
-  console.log(acc)
-  return {
-    ...acc,
-    [form.id]: ''
+  const [respostas, setRespostas] = React.useState(
+    perguntas.reduce((acc, pergunta) => {
+      return {
+        ...acc,
+        [pergunta.id]: '',
+      };
+    }, {}),
+  );
+
+  const [slide, setSlide] = React.useState(0);
+  const [resultado, setResultado] = React.useState(null);
+
+  function resultadoFinal() {
+    const corretas = perguntas.filter(
+      ({ id, resposta }) => respostas[id] === resposta,
+    );
+    console.log(corretas);
+    setResultado(`Você acertou ${corretas.length} de ${perguntas.length}`);
   }
-},{})
-);
 
-const [response, setResponse] = React.useState(null);
+  function handleClick() {
+    if (slide < perguntas.length -1) {
+      setSlide(slide + 1);
+    } else {
+      setResultado(slide + 1);
 
-function handleChange ({target}) {
-  const {id, value} = target
-  setForm({...form, [id]:value })
-}
-function handleSubmit(event) {
-  event.preventDefault();
-  fetch('https://ranekapi.origamid.dev/json/api/usuario', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(form),
-  }).then((response) => {
-    setResponse(response);
-  });
-}
+      resultadoFinal();
+    }
+  }
 
+  function handleChange({ target }) {
+    setRespostas({ ...respostas, [target.id]: target.value });
+  }
 
   return (
-    <form onSubmit={handleSubmit}>
-      {formFields.map((item) => (
-        <div key={item.id}>
-          <label htmlFor={item.id}>{item.label}</label>
-          <input type={item.type} id={item.id} value={form[item.id]} onChange={handleChange}/>
-        </div>
+    <form onSubmit={(event) => event.preventDefault()}>
+      {perguntas.map((pergunta, index) => (
+        <Radio
+          active={slide === index}
+          key={pergunta.id}
+          onChange={handleChange}
+          value={respostas[pergunta.id]}
+          {...pergunta}
+        />
       ))}
-      <button>Enviar</button>
-      {response && response.ok && <p>Usuário Criado</p>}
+      {resultado ? (
+        <p>{resultado}</p>
+      ) : (
+        <button onClick={handleClick}>Proximo</button>
+      )}
     </form>
-  )
-}
+  );
+};
 
-export default App
+export default App;
